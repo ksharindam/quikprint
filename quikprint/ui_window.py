@@ -90,10 +90,16 @@ class Ui_Dialog(object):
         self.label.setObjectName(_fromUtf8("label"))
         self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1)
         self.colorBtn = QtGui.QRadioButton(self.groupBox_2)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/color.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.colorBtn.setIcon(icon)
         self.colorBtn.setChecked(True)
         self.colorBtn.setObjectName(_fromUtf8("colorBtn"))
         self.gridLayout_2.addWidget(self.colorBtn, 0, 1, 1, 1)
         self.grayBtn = QtGui.QRadioButton(self.groupBox_2)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(_fromUtf8(":/grayscale.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.grayBtn.setIcon(icon1)
         self.grayBtn.setObjectName(_fromUtf8("grayBtn"))
         self.gridLayout_2.addWidget(self.grayBtn, 1, 1, 1, 1)
         self.label_2 = QtGui.QLabel(self.groupBox_2)
@@ -264,3 +270,4 @@ class Ui_Dialog(object):
         self.cancelBtn.setText(_translate("Dialog", "Cancel", None))
         self.printBtn.setText(_translate("Dialog", "Print", None))
 
+import resources_rc

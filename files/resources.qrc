@@ -1,0 +1,6 @@
+<RCC>
+  <qresource>
+    <file>color.png</file>
+    <file>grayscale.png</file>
+  </qresource>
+</RCC>

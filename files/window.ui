@@ -153,6 +153,10 @@
         <property name="text">
          <string>Color</string>
         </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/color.png</normaloff>:/color.png</iconset>
+        </property>
         <property name="checked">
          <bool>true</bool>
         </property>
@@ -162,6 +166,10 @@
        <widget class="QRadioButton" name="grayBtn">
         <property name="text">
          <string>Gray Scale</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/grayscale.png</normaloff>:/grayscale.png</iconset>
         </property>
        </widget>
       </item>
@@ -465,6 +473,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
