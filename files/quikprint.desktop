@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Quik Print
+Comment=Simple Qt frontend of Printing command lp
+Icon=printer
+Exec=quikprint %F
+NoDisplay=false
+Categories=System;
+MimeType=image/*;application/pdf;
+StartupNotify=false
+Terminal=false
