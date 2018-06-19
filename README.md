@@ -13,3 +13,6 @@ To print a file right click the file in file manager and select _Open With..._ Q
 
 Or in a terminal type...  
 `quikprint file.pdf`  
+
+### Screenshot
+![Screenshot](files/Screenshot.png)
