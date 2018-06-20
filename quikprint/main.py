@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -- coding: utf-8 --
 
-import sys, os
+import sys, os, subprocess
 from PyQt4.QtGui import QApplication, QDialog, QButtonGroup, QRegExpValidator, QMessageBox
 from PyQt4.QtCore import QString, QProcess, QRegExp, QSettings
 from ui_window import Ui_Dialog
@@ -29,7 +29,8 @@ class Window(QDialog, Ui_Dialog):
         self.papersizeCombo.currentIndexChanged.connect(self.onPaperSizeChange)
         self.pixelDensityBtn.clicked.connect(self.onDensityBtnClick)
         self.printBtn.clicked.connect(self.accept)
-        self.cancelBtn.clicked.connect(self.reject)
+        self.quitBtn.clicked.connect(self.reject)
+        self.cancelJobsBtn.clicked.connect(self.cancelPrintJobs)
         # Set values
         self.process = QProcess(self)
         printers = self.getPrinters()
@@ -68,17 +69,19 @@ class Window(QDialog, Ui_Dialog):
         self.naturalScalingSpin.setEnabled(checked)
 
     def accept(self):
+        printer = str(self.printersCombo.currentText())
         color_model = 'RGB' if self.colorBtn.isChecked() else 'KGray'
         quality = self.quality[self.qualityCombo.currentIndex()]
         page_size = self.paper_sizes[self.papersizeCombo.currentIndex()]
-        lpoptions_args = ['-o', 'ColorModel='+color_model, '-o', 'OutputMode='+quality,
+        if page_size == 'Custom':
+            page_size = 'Custom.%ix%imm'%(self.widthSpin.value(), self.heightSpin.value())
+        lpoptions_args = ['-p', printer, '-o', 'ColorModel='+color_model, '-o', 'OutputMode='+quality,
                           '-o', 'PageSize='+page_size]
         self.process.start('lpoptions', lpoptions_args)
         if not self.process.waitForFinished():
             QMessageBox.critical(self, 'Error !', 'Error : Could not execute lpoptions', 'Close')
             return QDialog.accept(self)
         # get printing options
-        printer = str(self.printersCombo.currentText())
         copies = str(self.copiesSpin.value())
         lp_args = ['-d', printer, '-n', copies]
         if not self.pageSetAll.isChecked():
@@ -119,25 +122,11 @@ class Window(QDialog, Ui_Dialog):
             return 'color', 'FastDraft', 'A4'
         data = self.process.readAllStandardOutput()
         output = str(QString.fromUtf8(data)).strip()
-        #print output
-        lines = output.split('\n')
-        for line in lines:
-            if line.startswith('PageSize'):
-                for each in ['*A5', '*Letter']:
-                    if each in line:
-                        page_size = each[1:]
-                        break
-                    else :
-                        page_size = 'A4'
-            elif line.startswith('ColorModel'):
-                if '*RGB' in line:
-                    color_mode = 'color'
-                else:
-                    color_mode = 'gray'
-            elif line.startswith('OutputMode'):
-                for each in ['*FastDraft', '*Normal', '*Best', '*Photo']:
-                    if each in line:
-                        quality = each[1:]
+        values = parseOptions(output)
+        #print output            elif line.startswith('ColorModel'):
+        color_mode = 'color' if values['ColorModel']=='RGB' else 'gray'
+        quality = values['OutputMode']
+        page_size = values['PageSize'] if values['PageSize'] in ['A5', 'Letter'] else 'A4'
         return color_mode, quality, page_size
 
     def getPrinters(self):
@@ -148,12 +137,25 @@ class Window(QDialog, Ui_Dialog):
             return
         data = self.process.readAllStandardOutput()
         output = str(QString.fromUtf8(data)).strip()
+        if output == '' : return []
         lines = output.split('\n')
         printers = []
         for line in lines:
             printer = line.split(' ')[0]
             printers.append(printer)
         return printers
+
+    def cancelPrintJobs(self):
+        self.process.start('lpstat', ['-o'])
+        if not self.process.waitForFinished():
+            QMessageBox.critical(self, 'Error !', 'Error : Could not execute lpstat', 'Close')
+        data = self.process.readAllStandardOutput()
+        output = str(QString.fromUtf8(data)).strip()
+        if output == '': return
+        lines = output.split('\n')
+        for line in lines:
+            job_id = line.split(' ')[0]
+            subprocess.Popen(['cancel', job_id])
 
     def saveSettings(self):
         self.settings.setValue("FItToPage", self.fitToPageBtn.isChecked())
@@ -164,6 +166,18 @@ class Window(QDialog, Ui_Dialog):
         self.settings.setValue("Scaling", self.scalingSpin.value())
         self.settings.setValue("PaperW", self.widthSpin.value())
         self.settings.setValue("PaperH", self.heightSpin.value())
+
+def parseOptions(text):
+    ''' Returns a dictionary with options and arguments'''
+    value_dict = {}
+    lines = text.split('\n')
+    for line in lines:
+        option, values = line.split('/')
+        values = values.split(':')[1].split()
+        for value in values:
+            if value.startswith('*'):
+                value_dict[option] = value[1:]
+    return value_dict
 
 def main():
     app = QApplication(sys.argv)

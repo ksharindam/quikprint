@@ -8,7 +8,7 @@ Description = Simple Qt frontend of Printing command lp
 Changes :
         
 ...........................................................................
-|   Copyright (C) 2018 Arindam Chaudhuri <ksharindam@gmail.com>       |
+|   Copyright (C) 2018 Arindam Chaudhuri <ksharindam@gmail.com>            |
 |                                                                          |
 |   This program is free software: you can redistribute it and/or modify   |
 |   it under the terms of the GNU General Public License as published by   |
@@ -25,8 +25,7 @@ Changes :
 ...........................................................................
 """
 #TODO : 
-#      setup custom page size
 #      select filenames when not provided via args
 
-__version__ = '1.0'
+__version__ = '1.1'
 
