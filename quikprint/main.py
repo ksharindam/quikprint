@@ -69,6 +69,7 @@ class Window(QDialog, Ui_Dialog):
         self.naturalScalingSpin.setEnabled(checked)
 
     def accept(self):
+        if self.pagerangeEdit.text() == '' : return
         printer = str(self.printersCombo.currentText())
         color_model = 'RGB' if self.colorBtn.isChecked() else 'KGray'
         quality = self.quality[self.qualityCombo.currentIndex()]
@@ -111,9 +112,6 @@ class Window(QDialog, Ui_Dialog):
                 QMessageBox.critical(self, 'Error !', 'Error : Could not execute lp', 'Close')
         self.saveSettings()
         QDialog.accept(self)
-
-    def validPageRange(self):
-        return True
 
     def getPrinterConfig(self):
         self.process.start('lpoptions', ['-l'])

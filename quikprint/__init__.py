@@ -26,6 +26,7 @@ Changes :
 """
 #TODO : 
 #      select filenames when not provided via args
+#      validate page range
 
 __version__ = '1.1'
 
