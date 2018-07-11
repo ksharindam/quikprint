@@ -7,6 +7,6 @@ Icon=printer
 Exec=quikprint %F
 NoDisplay=false
 Categories=System;
-MimeType=image/*;application/pdf;
+MimeType=image/*;application/pdf;application/postscript;
 StartupNotify=false
 Terminal=false

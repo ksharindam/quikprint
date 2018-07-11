@@ -69,7 +69,7 @@ class Window(QDialog, Ui_Dialog):
         self.naturalScalingSpin.setEnabled(checked)
 
     def accept(self):
-        if self.pagerangeEdit.text() == '' : return
+        if self.rangeBtn.isChecked() and self.pagerangeEdit.text() == '' : return
         printer = str(self.printersCombo.currentText())
         color_model = 'RGB' if self.colorBtn.isChecked() else 'KGray'
         quality = self.quality[self.qualityCombo.currentIndex()]
