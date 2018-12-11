@@ -69,12 +69,20 @@
         <property name="text">
          <string>Odd</string>
         </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/odd-page.png</normaloff>:/odd-page.png</iconset>
+        </property>
        </widget>
       </item>
       <item row="5" column="2">
        <widget class="QRadioButton" name="pageSetEven">
         <property name="text">
          <string>Even</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/even-page.png</normaloff>:/even-page.png</iconset>
         </property>
        </widget>
       </item>

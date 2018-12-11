@@ -3,10 +3,11 @@ Name = quikprint
 Executable Command = quikprint
 Package Name = quikprint
 Python Module Name = quikprint
-Debian Dependency = python-qt4
+Debian Dependency = python-qt4, cups
 Description = Simple Qt frontend of Printing command lp
 Changes :
-        
+v1.2    Selects filenames when not provided via cmdline args
+        Even and odd pages icons added
 ...........................................................................
 |   Copyright (C) 2018 Arindam Chaudhuri <ksharindam@gmail.com>            |
 |                                                                          |
@@ -25,8 +26,7 @@ Changes :
 ...........................................................................
 """
 #TODO : 
-#      select filenames when not provided via args
 #      validate page range
 
-__version__ = '1.1'
+__version__ = '1.2'
 

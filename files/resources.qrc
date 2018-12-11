@@ -1,5 +1,7 @@
 <RCC>
   <qresource>
+    <file>odd-page.png</file>
+    <file>even-page.png</file>
     <file>color.png</file>
     <file>grayscale.png</file>
   </qresource>

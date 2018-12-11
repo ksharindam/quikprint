@@ -2,7 +2,8 @@
 # -- coding: utf-8 --
 
 import sys, os, subprocess
-from PyQt4.QtGui import QApplication, QDialog, QButtonGroup, QRegExpValidator, QMessageBox
+from PyQt4.QtGui import (QApplication, QDialog, QButtonGroup, QRegExpValidator,
+    QMessageBox, QFileDialog)
 from PyQt4.QtCore import QString, QProcess, QRegExp, QSettings
 from ui_window import Ui_Dialog
 
@@ -69,6 +70,16 @@ class Window(QDialog, Ui_Dialog):
         self.naturalScalingSpin.setEnabled(checked)
 
     def accept(self):
+        filenames = []
+        if len(sys.argv)>1 :
+            for each in sys.argv[1:]:
+                if os.path.exists(each):
+                    filenames.append(os.path.abspath(each).decode('utf8'))
+        if filenames == []:
+            files = QFileDialog.getOpenFileNames(self, 'Select Files to Print')
+            if list(files) == [] : return
+            for each in files:
+                filenames.append(unicode(each))
         if self.rangeBtn.isChecked() and self.pagerangeEdit.text() == '' : return
         printer = str(self.printersCombo.currentText())
         color_model = 'RGB' if self.colorBtn.isChecked() else 'KGray'
@@ -101,15 +112,9 @@ class Window(QDialog, Ui_Dialog):
         positions = ['top', 'center', 'bottom']
         lp_args += ['-o', 'position='+positions[self.positionCombo.currentIndex()]]
         print ' '.join(lp_args)
-        filenames = []
-        if len(sys.argv)>1 :
-            for each in sys.argv[1:]:
-                if os.path.exists(each):
-                    filenames.append(each.decode('utf8'))
-        if filenames != []:
-            self.process.start('lp', lp_args + ['--'] + filenames)
-            if not self.process.waitForFinished():
-                QMessageBox.critical(self, 'Error !', 'Error : Could not execute lp', 'Close')
+        self.process.start('lp', lp_args + ['--'] + filenames)
+        if not self.process.waitForFinished():
+            QMessageBox.critical(self, 'Error !', 'Error : Could not execute lp', 'Close')
         self.saveSettings()
         QDialog.accept(self)
 
