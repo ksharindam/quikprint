@@ -125,6 +125,7 @@ class Window(QDialog, Ui_Dialog):
             return 'color', 'FastDraft', 'A4'
         data = self.process.readAllStandardOutput()
         output = str(QString.fromUtf8(data)).strip()
+        if output == "" : return 'color', 'Normal', 'A4'
         values = parseOptions(output)
         #print output            elif line.startswith('ColorModel'):
         color_mode = 'color' if values['ColorModel']=='RGB' else 'gray'

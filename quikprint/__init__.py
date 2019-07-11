@@ -6,10 +6,11 @@ Python Module Name = quikprint
 Debian Dependency = python-qt4, cups
 Description = Simple Qt frontend of Printing command lp
 Changes :
+v1.3    fixed : crash at startup if no printer added
 v1.2    Selects filenames when not provided via cmdline args
         Even and odd pages icons added
 ...........................................................................
-|   Copyright (C) 2018 Arindam Chaudhuri <ksharindam@gmail.com>            |
+|   Copyright (C) 2019 Arindam Chaudhuri <ksharindam@gmail.com>            |
 |                                                                          |
 |   This program is free software: you can redistribute it and/or modify   |
 |   it under the terms of the GNU General Public License as published by   |
@@ -25,8 +26,8 @@ v1.2    Selects filenames when not provided via cmdline args
 |   along with this program.  If not, see <http://www.gnu.org/licenses/>.  |
 ...........................................................................
 """
-#TODO : 
+#TODO :
 #      validate page range
 
-__version__ = '1.2'
+__version__ = '1.3'
 
