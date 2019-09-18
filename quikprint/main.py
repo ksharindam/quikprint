@@ -1,12 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -- coding: utf-8 --
 
 import sys, os, subprocess
 from PyQt4.QtGui import (QApplication, QDialog, QButtonGroup, QRegExpValidator,
     QMessageBox, QFileDialog)
-from PyQt4.QtCore import QString, QProcess, QRegExp, QSettings
+from PyQt4.QtCore import QProcess, QRegExp, QSettings
+
+sys.path.append(os.path.dirname(__file__))
 from ui_window import Ui_Dialog
 
+fromByteArray = lambda bA : bytes(bA).decode("utf-8")
 
 class Window(QDialog, Ui_Dialog):
     def __init__(self):
@@ -43,13 +46,13 @@ class Window(QDialog, Ui_Dialog):
         self.papersizeCombo.setCurrentIndex(self.paper_sizes.index(paper_size))
         fit_to_page = True if self.settings.value("FitToPage", "false")=='true' else False
         self.fitToPageBtn.setChecked(fit_to_page)
-        brightness = int(self.settings.value("Brightness", 100).toString())
-        gamma = int(self.settings.value("Gamma", 1000).toString())
-        ppi = int(self.settings.value("PPI", 300).toString())
-        natural_scaling = int(self.settings.value("NaturalScaling", 100).toString())
-        scaling = int(self.settings.value("Scaling", 100).toString())
-        paper_w = int(self.settings.value("PaperW", 100).toString())
-        paper_h = int(self.settings.value("PaperH", 100).toString())
+        brightness = int(self.settings.value("Brightness", 100))
+        gamma = int(self.settings.value("Gamma", 1000))
+        ppi = int(self.settings.value("PPI", 300))
+        natural_scaling = int(self.settings.value("NaturalScaling", 100))
+        scaling = int(self.settings.value("Scaling", 100))
+        paper_w = int(self.settings.value("PaperW", 100))
+        paper_h = int(self.settings.value("PaperH", 100))
         self.brightnessSpin.setValue(brightness)
         self.gammaSpin.setValue(gamma)
         self.ppiSpin.setValue(ppi)
@@ -74,14 +77,14 @@ class Window(QDialog, Ui_Dialog):
         if len(sys.argv)>1 :
             for each in sys.argv[1:]:
                 if os.path.exists(each):
-                    filenames.append(os.path.abspath(each).decode('utf8'))
+                    filenames.append(os.path.abspath(each))
         if filenames == []:
             files = QFileDialog.getOpenFileNames(self, 'Select Files to Print')
             if list(files) == [] : return
             for each in files:
-                filenames.append(unicode(each))
+                filenames.append(each)
         if self.rangeBtn.isChecked() and self.pagerangeEdit.text() == '' : return
-        printer = str(self.printersCombo.currentText())
+        printer = self.printersCombo.currentText()
         color_model = 'RGB' if self.colorBtn.isChecked() else 'KGray'
         quality = self.quality[self.qualityCombo.currentIndex()]
         page_size = self.paper_sizes[self.papersizeCombo.currentIndex()]
@@ -100,7 +103,7 @@ class Window(QDialog, Ui_Dialog):
             page_set = 'odd' if self.pageSetOdd.isChecked() else 'even'
             lp_args += ['-o', 'page-set='+page_set]
         if not self.allPagesBtn.isChecked():
-            lp_args += ['-o', 'page-ranges='+str(self.pagerangeEdit.text())]
+            lp_args += ['-o', 'page-ranges='+self.pagerangeEdit.text()]
         if self.fitToPageBtn.isChecked():
             lp_args += ['-o', 'fit-to-page']
         lp_args += ['-o', 'brightness=%i'%self.brightnessSpin.value()]
@@ -111,7 +114,7 @@ class Window(QDialog, Ui_Dialog):
             lp_args += ['-o', 'scaling=%i'%self.scalingSpin.value()]
         positions = ['top', 'center', 'bottom']
         lp_args += ['-o', 'position='+positions[self.positionCombo.currentIndex()]]
-        print ' '.join(lp_args)
+        print(' '.join(lp_args))
         self.process.start('lp', lp_args + ['--'] + filenames)
         if not self.process.waitForFinished():
             QMessageBox.critical(self, 'Error !', 'Error : Could not execute lp', 'Close')
@@ -124,10 +127,9 @@ class Window(QDialog, Ui_Dialog):
             QMessageBox.critical(self, 'Error !', 'Error : Could not execute lpoptions', 'Close')
             return 'color', 'FastDraft', 'A4'
         data = self.process.readAllStandardOutput()
-        output = str(QString.fromUtf8(data)).strip()
+        output = fromByteArray(data).strip()
         if output == "" : return 'color', 'Normal', 'A4'
         values = parseOptions(output)
-        #print output            elif line.startswith('ColorModel'):
         color_mode = 'color' if values['ColorModel']=='RGB' else 'gray'
         quality = values['OutputMode']
         page_size = values['PageSize'] if values['PageSize'] in ['A5', 'Letter'] else 'A4'
@@ -137,13 +139,15 @@ class Window(QDialog, Ui_Dialog):
         ''' Get the list of available printers '''
         self.process.start('lpstat', ['-a'])
         if not self.process.waitForFinished():
-            print 'Error : could not execute lpstat'
+            print('Error : could not execute lpstat')
             return
         data = self.process.readAllStandardOutput()
-        output = str(QString.fromUtf8(data)).strip()
+        output = fromByteArray(data).strip()
         if output == '' : return []
         lines = output.split('\n')
         printers = []
+        # each line is like
+        # 'DeskJet_2130 accepting requests since Mon 12 Aug 2019 09:08:12 AM IST\n'
         for line in lines:
             printer = line.split(' ')[0]
             printers.append(printer)
@@ -154,7 +158,7 @@ class Window(QDialog, Ui_Dialog):
         if not self.process.waitForFinished():
             QMessageBox.critical(self, 'Error !', 'Error : Could not execute lpstat', 'Close')
         data = self.process.readAllStandardOutput()
-        output = str(QString.fromUtf8(data)).strip()
+        output = fromByteArray(data).strip()
         if output == '': return
         lines = output.split('\n')
         for line in lines:
@@ -175,6 +179,8 @@ def parseOptions(text):
     ''' Returns a dictionary with options and arguments'''
     value_dict = {}
     lines = text.split('\n')
+    # each line is like "ColorModel/Output Mode: CMYGray *KGray RGB"
+    # * marked value is the selected value
     for line in lines:
         option, values = line.split('/')
         values = values.split(':')[1].split()

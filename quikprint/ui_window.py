@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'files/window.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -215,6 +215,7 @@ class Ui_Dialog(object):
         self.widget.setSizePolicy(sizePolicy)
         self.widget.setObjectName(_fromUtf8("widget"))
         self.horizontalLayout = QtGui.QHBoxLayout(self.widget)
+        self.horizontalLayout.setMargin(0)
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.cancelJobsBtn = QtGui.QPushButton(self.widget)
         self.cancelJobsBtn.setIconSize(QtCore.QSize(24, 24))

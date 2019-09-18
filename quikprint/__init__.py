@@ -3,9 +3,10 @@ Name = quikprint
 Executable Command = quikprint
 Package Name = quikprint
 Python Module Name = quikprint
-Debian Dependency = python-qt4, cups
+Debian Dependency = python3-pyqt4, cups
 Description = Simple Qt frontend of Printing command lp
 Changes :
+v2.0    ported to python3
 v1.3    fixed : crash at startup if no printer added
 v1.2    Selects filenames when not provided via cmdline args
         Even and odd pages icons added
@@ -29,5 +30,5 @@ v1.2    Selects filenames when not provided via cmdline args
 #TODO :
 #      validate page range
 
-__version__ = '1.3'
+__version__ = '2.0'
 
