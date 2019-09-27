@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>463</height>
+    <height>511</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -477,12 +477,18 @@
         <property name="text">
          <string>Quit</string>
         </property>
+        <property name="icon">
+         <iconset theme="process-stop"/>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="printBtn">
         <property name="text">
          <string>Print</string>
+        </property>
+        <property name="icon">
+         <iconset theme="document-print"/>
         </property>
         <property name="default">
          <bool>true</bool>

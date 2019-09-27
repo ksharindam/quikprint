@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(640, 463)
+        Dialog.resize(640, 511)
         self.gridLayout_4 = QtGui.QGridLayout(Dialog)
         self.gridLayout_4.setObjectName(_fromUtf8("gridLayout_4"))
         self.label_7 = QtGui.QLabel(Dialog)
@@ -224,9 +224,13 @@ class Ui_Dialog(object):
         spacerItem = QtGui.QSpacerItem(435, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.quitBtn = QtGui.QPushButton(self.widget)
+        icon = QtGui.QIcon.fromTheme(_fromUtf8("process-stop"))
+        self.quitBtn.setIcon(icon)
         self.quitBtn.setObjectName(_fromUtf8("quitBtn"))
         self.horizontalLayout.addWidget(self.quitBtn)
         self.printBtn = QtGui.QPushButton(self.widget)
+        icon = QtGui.QIcon.fromTheme(_fromUtf8("document-print"))
+        self.printBtn.setIcon(icon)
         self.printBtn.setDefault(True)
         self.printBtn.setObjectName(_fromUtf8("printBtn"))
         self.horizontalLayout.addWidget(self.printBtn)

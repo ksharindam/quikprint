@@ -3,7 +3,7 @@
 
 import sys, os, subprocess
 from PyQt4.QtGui import (QApplication, QDialog, QButtonGroup, QRegExpValidator,
-    QMessageBox, QFileDialog)
+    QMessageBox, QFileDialog, QIcon)
 from PyQt4.QtCore import QProcess, QRegExp, QSettings
 
 sys.path.append(os.path.dirname(__file__))
@@ -14,6 +14,7 @@ fromByteArray = lambda bA : bytes(bA).decode("utf-8")
 class Window(QDialog, Ui_Dialog):
     def __init__(self):
         QDialog.__init__(self)
+        QIcon.setThemeName("Adwaita")
         self.setupUi(self)
         self.quality = ['FastDraft', 'Normal', 'Best', 'Photo']
         self.paper_sizes = ['A4', 'A5', 'Letter', 'Custom']
