@@ -25,8 +25,9 @@ except AttributeError:
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(640, 511)
+        Dialog.resize(640, 516)
         self.gridLayout_4 = QtGui.QGridLayout(Dialog)
+        self.gridLayout_4.setContentsMargins(-1, -1, -1, 2)
         self.gridLayout_4.setObjectName(_fromUtf8("gridLayout_4"))
         self.label_7 = QtGui.QLabel(Dialog)
         self.label_7.setObjectName(_fromUtf8("label_7"))

@@ -6,6 +6,7 @@ Python Module Name = quikprint
 Debian Dependency = python3-pyqt4, cups
 Description = Simple Qt frontend of Printing command lp
 Changes :
+v2.2    bottom margin decreased
 v2.1    button icons added
 v2.0    ported to python3
 v1.3    fixed : crash at startup if no printer added
@@ -31,5 +32,5 @@ v1.2    Selects filenames when not provided via cmdline args
 #TODO :
 #      validate page range
 
-__version__ = '2.1'
+__version__ = '2.2'
 
