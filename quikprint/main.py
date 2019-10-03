@@ -16,6 +16,7 @@ class Window(QDialog, Ui_Dialog):
         QDialog.__init__(self)
         QIcon.setThemeName("Adwaita")
         self.setupUi(self)
+        self.resize(640, 480)
         self.quality = ['FastDraft', 'Normal', 'Best', 'Photo']
         self.paper_sizes = ['A4', 'A5', 'Letter', 'Custom']
         self.settings = QSettings(self)
