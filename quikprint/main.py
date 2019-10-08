@@ -8,6 +8,7 @@ from PyQt4.QtCore import QProcess, QRegExp, QSettings
 
 sys.path.append(os.path.dirname(__file__))
 from ui_window import Ui_Dialog
+from __init__ import __version__
 
 fromByteArray = lambda bA : bytes(bA).decode("utf-8")
 
@@ -17,8 +18,9 @@ class Window(QDialog, Ui_Dialog):
         QIcon.setThemeName("Adwaita")
         self.setupUi(self)
         self.resize(640, 480)
+        self.setWindowTitle("QuikPrint  " + __version__)
         self.quality = ['FastDraft', 'Normal', 'Best', 'Photo']
-        self.paper_sizes = ['A4', 'A5', 'Letter', 'Custom']
+        self.paper_sizes = ['A4', 'A5', 'Letter', 'Legal', 'Custom'] #WIDTHxHEIGHT
         self.settings = QSettings(self)
         # Create and setup widgets
         self.widthSpin.setHidden(True)
@@ -64,8 +66,9 @@ class Window(QDialog, Ui_Dialog):
         self.heightSpin.setValue(paper_h)
 
     def onPaperSizeChange(self, index):
-        self.widthSpin.setHidden(not index==3)
-        self.heightSpin.setHidden(not index==3)
+        hide_custom = index!=len(self.paper_sizes)-1
+        self.widthSpin.setHidden(hide_custom)
+        self.heightSpin.setHidden(hide_custom)
 
     def onPageRangeChange(self, btn):
         self.pagerangeEdit.setEnabled(btn is self.rangeBtn)
@@ -94,6 +97,7 @@ class Window(QDialog, Ui_Dialog):
             page_size = 'Custom.%ix%imm'%(self.widthSpin.value(), self.heightSpin.value())
         lpoptions_args = ['-p', printer, '-o', 'ColorModel='+color_model, '-o', 'OutputMode='+quality,
                           '-o', 'PageSize='+page_size]
+        print('lpoptions', ' '.join(lpoptions_args))
         self.process.start('lpoptions', lpoptions_args)
         if not self.process.waitForFinished():
             QMessageBox.critical(self, 'Error !', 'Error : Could not execute lpoptions', 'Close')
@@ -116,7 +120,7 @@ class Window(QDialog, Ui_Dialog):
             lp_args += ['-o', 'scaling=%i'%self.scalingSpin.value()]
         positions = ['top', 'center', 'bottom']
         lp_args += ['-o', 'position='+positions[self.positionCombo.currentIndex()]]
-        print(' '.join(lp_args))
+        print('lp', ' '.join(lp_args))
         self.process.start('lp', lp_args + ['--'] + filenames)
         if not self.process.waitForFinished():
             QMessageBox.critical(self, 'Error !', 'Error : Could not execute lp', 'Close')
@@ -124,6 +128,7 @@ class Window(QDialog, Ui_Dialog):
         QDialog.accept(self)
 
     def getPrinterConfig(self):
+        print('lpoptions -l')
         self.process.start('lpoptions', ['-l'])
         if not self.process.waitForFinished():
             QMessageBox.critical(self, 'Error !', 'Error : Could not execute lpoptions', 'Close')
@@ -134,7 +139,10 @@ class Window(QDialog, Ui_Dialog):
         values = parseOptions(output)
         color_mode = 'color' if values['ColorModel']=='RGB' else 'gray'
         quality = values['OutputMode']
-        page_size = values['PageSize'] if values['PageSize'] in ['A5', 'Letter'] else 'A4'
+        if values['PageSize'] in self.paper_sizes :
+            page_size = values['PageSize']
+        else :
+            page_size = 'A4'
         return color_mode, quality, page_size
 
     def getPrinters(self):
