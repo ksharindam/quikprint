@@ -6,6 +6,7 @@ Python Module Name = quikprint
 Debian Dependency = python3-pyqt4, cups
 Description = Simple Qt frontend of Printing command lp
 Changes :
+v2.5    custom pagesize is remembered
 v2.4    legal size paper added
 v2.3    window height decreased
 v2.2    bottom margin decreased
@@ -34,5 +35,5 @@ v1.2    Selects filenames when not provided via cmdline args
 #TODO :
 #      validate page range
 
-__version__ = '2.4'
+__version__ = '2.5'
 

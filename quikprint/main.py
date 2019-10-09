@@ -19,9 +19,8 @@ class Window(QDialog, Ui_Dialog):
         self.setupUi(self)
         self.resize(640, 480)
         self.setWindowTitle("QuikPrint  " + __version__)
-        self.quality = ['FastDraft', 'Normal', 'Best', 'Photo']
-        self.paper_sizes = ['A4', 'A5', 'Letter', 'Legal', 'Custom'] #WIDTHxHEIGHT
         self.settings = QSettings(self)
+        self.process = QProcess(self)
         # Create and setup widgets
         self.widthSpin.setHidden(True)
         self.heightSpin.setHidden(True)
@@ -40,14 +39,21 @@ class Window(QDialog, Ui_Dialog):
         self.quitBtn.clicked.connect(self.reject)
         self.cancelJobsBtn.clicked.connect(self.cancelPrintJobs)
         # Set values
-        self.process = QProcess(self)
         printers = self.getPrinters()
+        if printers == []:
+            QMessageBox.critical(self, 'Error !', 'No Printers added', 'Close')
+            return QDialog.accept(self)
         self.printersCombo.addItems(printers)
-        color_mode, quality, paper_size = self.getPrinterConfig()
-        if color_mode == 'color': self.colorBtn.setChecked(True)
-        else : self.grayBtn.setChecked(True)
-        self.qualityCombo.setCurrentIndex(self.quality.index(quality))
-        self.papersizeCombo.setCurrentIndex(self.paper_sizes.index(paper_size))
+        # get first selected printer options
+        printer = Deskjet_2130(printers[0])
+        if not printer.getOptions():
+            QMessageBox.critical(self, 'Error !', 'Could not get Printer options', 'Close')
+            return QDialog.accept(self)
+        self.colorBtn.setChecked(printer.color_print)
+        self.grayBtn.setChecked(not printer.color_print)
+        self.qualityCombo.setCurrentIndex(printer.quality_index)
+        self.papersizeCombo.setCurrentIndex(printer.papersize_index)
+        # get printer independent options
         fit_to_page = True if self.settings.value("FitToPage", "false")=='true' else False
         self.fitToPageBtn.setChecked(fit_to_page)
         brightness = int(self.settings.value("Brightness", 100))
@@ -66,7 +72,7 @@ class Window(QDialog, Ui_Dialog):
         self.heightSpin.setValue(paper_h)
 
     def onPaperSizeChange(self, index):
-        hide_custom = index!=len(self.paper_sizes)-1
+        hide_custom = self.papersizeCombo.currentText()!="Custom"
         self.widthSpin.setHidden(hide_custom)
         self.heightSpin.setHidden(hide_custom)
 
@@ -89,22 +95,18 @@ class Window(QDialog, Ui_Dialog):
             for each in files:
                 filenames.append(each)
         if self.rangeBtn.isChecked() and self.pagerangeEdit.text() == '' : return
-        printer = self.printersCombo.currentText()
-        color_model = 'RGB' if self.colorBtn.isChecked() else 'KGray'
-        quality = self.quality[self.qualityCombo.currentIndex()]
-        page_size = self.paper_sizes[self.papersizeCombo.currentIndex()]
-        if page_size == 'Custom':
-            page_size = 'Custom.%ix%imm'%(self.widthSpin.value(), self.heightSpin.value())
-        lpoptions_args = ['-p', printer, '-o', 'ColorModel='+color_model, '-o', 'OutputMode='+quality,
-                          '-o', 'PageSize='+page_size]
-        print('lpoptions', ' '.join(lpoptions_args))
-        self.process.start('lpoptions', lpoptions_args)
-        if not self.process.waitForFinished():
-            QMessageBox.critical(self, 'Error !', 'Error : Could not execute lpoptions', 'Close')
+        device = self.printersCombo.currentText()
+        printer = Deskjet_2130(device)
+        color_print = self.colorBtn.isChecked()
+        quality_index = self.qualityCombo.currentIndex()
+        papersize_index = self.papersizeCombo.currentIndex()
+        custom_size = [self.widthSpin.value(), self.heightSpin.value()]
+        if not printer.setOptions(color_print, quality_index, papersize_index, custom_size):
+            QMessageBox.critical(self, 'Error !', 'Could not set printer options', 'Close')
             return QDialog.accept(self)
         # get printing options
         copies = str(self.copiesSpin.value())
-        lp_args = ['-d', printer, '-n', copies]
+        lp_args = ['-d', device, '-n', copies]
         if not self.pageSetAll.isChecked():
             page_set = 'odd' if self.pageSetOdd.isChecked() else 'even'
             lp_args += ['-o', 'page-set='+page_set]
@@ -126,24 +128,6 @@ class Window(QDialog, Ui_Dialog):
             QMessageBox.critical(self, 'Error !', 'Error : Could not execute lp', 'Close')
         self.saveSettings()
         QDialog.accept(self)
-
-    def getPrinterConfig(self):
-        print('lpoptions -l')
-        self.process.start('lpoptions', ['-l'])
-        if not self.process.waitForFinished():
-            QMessageBox.critical(self, 'Error !', 'Error : Could not execute lpoptions', 'Close')
-            return 'color', 'FastDraft', 'A4'
-        data = self.process.readAllStandardOutput()
-        output = fromByteArray(data).strip()
-        if output == "" : return 'color', 'Normal', 'A4'
-        values = parseOptions(output)
-        color_mode = 'color' if values['ColorModel']=='RGB' else 'gray'
-        quality = values['OutputMode']
-        if values['PageSize'] in self.paper_sizes :
-            page_size = values['PageSize']
-        else :
-            page_size = 'A4'
-        return color_mode, quality, page_size
 
     def getPrinters(self):
         ''' Get the list of available printers '''
@@ -198,6 +182,51 @@ def parseOptions(text):
             if value.startswith('*'):
                 value_dict[option] = value[1:]
     return value_dict
+
+
+class Deskjet_2130:
+    ''' Handles printer specific options '''
+    def __init__(self, printer_device):
+        self.printer = printer_device
+        self.quality = ['FastDraft', 'Normal', 'Best', 'Photo']
+        self.paper_sizes = ['A4', 'A5', 'Letter', 'Legal', 'Custom.WIDTHxHEIGHT']
+        self.process = QProcess()
+        self.color_print = False
+        self.quality_index = 0
+        self.papersize_index = 0
+
+    def getOptions(self):
+        print('lpoptions -p %s -l'%self.printer)
+        self.process.start('lpoptions', ['-p', self.printer, '-l'])
+        if not self.process.waitForFinished():
+            return False
+        data = self.process.readAllStandardOutput()
+        output = fromByteArray(data).strip()
+        if output == "" :
+            return False
+        values = parseOptions(output)
+        self.color_print = True if values['ColorModel']=='RGB' else False
+        self.quality_index = self.quality.index(values['OutputMode'])
+        if values['PageSize'] in self.paper_sizes :
+            self.papersize_index = self.paper_sizes.index(values['PageSize'])
+        return True
+
+    def setOptions(self, color_print, quality_index, papersize_index, custom_size=[]):
+        color_model = 'RGB' if color_print else 'KGray'
+        quality = self.quality[quality_index]
+        page_size = self.paper_sizes[papersize_index]
+        if page_size == 'Custom.WIDTHxHEIGHT':
+            page_size = 'Custom.%ix%imm'%(custom_size[0], custom_size[1])
+
+        lpoptions_args = ['-p', self.printer, '-o', 'ColorModel='+color_model,
+                    '-o', 'OutputMode='+quality, '-o', 'PageSize='+page_size]
+        print('lpoptions', ' '.join(lpoptions_args))
+        self.process.start('lpoptions', lpoptions_args)
+        if not self.process.waitForFinished():
+            print("Error : Could not execute lpoptions")
+            return False
+        return True
+
 
 def main():
     app = QApplication(sys.argv)
