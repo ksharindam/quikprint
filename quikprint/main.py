@@ -78,6 +78,7 @@ class Window(QDialog, Ui_Dialog):
 
     def onPageRangeChange(self, btn):
         self.pagerangeEdit.setEnabled(btn is self.rangeBtn)
+        self.pagerangeEdit.setFocus()
 
     def onDensityBtnClick(self, checked):
         self.ppiSpin.setEnabled(checked)
