@@ -106,8 +106,10 @@ class Window(QDialog, Ui_Dialog):
             QMessageBox.critical(self, 'Error !', 'Could not set printer options', 'Close')
             return QDialog.accept(self)
         # get printing options
-        copies = str(self.copiesSpin.value())
-        lp_args = ['-d', device, '-n', copies]
+        lp_args = ['-d', device]
+        copies = self.copiesSpin.value()
+        if copies>1 :
+            lp_args += ['-n', str(copies), '-o', 'collate=true']
         if not self.pageSetAll.isChecked():
             page_set = 'odd' if self.pageSetOdd.isChecked() else 'even'
             lp_args += ['-o', 'page-set='+page_set]

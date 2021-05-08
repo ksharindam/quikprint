@@ -6,6 +6,7 @@ Python Module Name = quikprint
 Debian Dependency = python3-pyqt4, cups
 Description = Simple Qt frontend of Printing command lp
 Changes :
+v2.7    collates copies if multiple copies are printed
 v2.6    rangeEdit is focused after range button is clicked
 v2.5    custom pagesize is remembered
 v2.4    legal size paper added
@@ -17,7 +18,7 @@ v1.3    fixed : crash at startup if no printer added
 v1.2    Selects filenames when not provided via cmdline args
         Even and odd pages icons added
 ...........................................................................
-|   Copyright (C) 2019 Arindam Chaudhuri <ksharindam@gmail.com>            |
+|   Copyright (C) 2019-2021 Arindam Chaudhuri <ksharindam@gmail.com>       |
 |                                                                          |
 |   This program is free software: you can redistribute it and/or modify   |
 |   it under the terms of the GNU General Public License as published by   |
@@ -36,5 +37,5 @@ v1.2    Selects filenames when not provided via cmdline args
 #TODO :
 #      validate page range
 
-__version__ = '2.6'
+__version__ = '2.7'
 
