@@ -115,6 +115,10 @@ class Window(QDialog, Ui_Dialog):
             lp_args += ['-o', 'page-set='+page_set]
         if not self.allPagesBtn.isChecked():
             lp_args += ['-o', 'page-ranges='+self.pagerangeEdit.text()]
+        # reverse pages so that first page will be on top
+        if self.allPagesBtn.isChecked() and self.pageSetAll.isChecked():
+            lp_args += ["-o", "outputorder=reverse"]
+        # scale page to fit inside print margin
         if self.fitToPageBtn.isChecked():
             lp_args += ['-o', 'fit-to-page']
         lp_args += ['-o', 'brightness=%i'%self.brightnessSpin.value()]
@@ -123,6 +127,7 @@ class Window(QDialog, Ui_Dialog):
             lp_args += ['-o', 'ppi=%i'%self.ppiSpin.value(), '-o', 'natural-scaling=%i'%self.naturalScalingSpin.value()]
         else:
             lp_args += ['-o', 'scaling=%i'%self.scalingSpin.value()]
+        # position is always left aligned
         positions = ['top', 'center', 'bottom']
         lp_args += ['-o', 'position='+positions[self.positionCombo.currentIndex()]]
         print('lp', ' '.join(lp_args))
