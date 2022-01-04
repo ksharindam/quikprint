@@ -129,27 +129,13 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="2" column="1">
-       <widget class="QComboBox" name="qualityCombo">
-        <item>
-         <property name="text">
-          <string>Fastest</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Normal</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Best</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Highest</string>
-         </property>
-        </item>
+       <widget class="QComboBox" name="qualityCombo"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Quality :</string>
+        </property>
        </widget>
       </item>
       <item row="0" column="0">
@@ -159,75 +145,10 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QRadioButton" name="colorBtn">
-        <property name="text">
-         <string>Color</string>
-        </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/color.png</normaloff>:/color.png</iconset>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="paperSizeCombo"/>
       </item>
-      <item row="1" column="1">
-       <widget class="QRadioButton" name="grayBtn">
-        <property name="text">
-         <string>Gray Scale</string>
-        </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/grayscale.png</normaloff>:/grayscale.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Quality :</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Paper Size :</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QComboBox" name="papersizeCombo">
-        <item>
-         <property name="text">
-          <string>A4</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>A5</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Letter</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Legal</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Custom</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QSpinBox" name="widthSpin">
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -239,11 +160,11 @@
          <number>400</number>
         </property>
         <property name="value">
-         <number>100</number>
+         <number>101</number>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <widget class="QSpinBox" name="heightSpin">
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -255,15 +176,47 @@
          <number>400</number>
         </property>
         <property name="value">
-         <number>100</number>
+         <number>152</number>
         </property>
        </widget>
       </item>
-      <item row="5" column="0" colspan="2">
+      <item row="6" column="0" colspan="2">
        <widget class="QCheckBox" name="fitToPageBtn">
         <property name="text">
          <string>Fit to Page</string>
         </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Paper Type :</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="paperTypeCombo"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="colorModeCombo">
+        <item>
+         <property name="text">
+          <string>Gray</string>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/grayscale.png</normaloff>:/grayscale.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Color</string>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/color.png</normaloff>:/color.png</iconset>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -460,7 +413,9 @@
          <string>Cancel Print Jobs</string>
         </property>
         <property name="icon">
-         <iconset theme="edit-clear"/>
+         <iconset theme="edit-clear">
+          <normaloff/>
+         </iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -489,7 +444,9 @@
          <string>Quit</string>
         </property>
         <property name="icon">
-         <iconset theme="process-stop"/>
+         <iconset theme="process-stop">
+          <normaloff/>
+         </iconset>
         </property>
        </widget>
       </item>
@@ -499,7 +456,9 @@
          <string>Print</string>
         </property>
         <property name="icon">
-         <iconset theme="document-print"/>
+         <iconset theme="document-print">
+          <normaloff/>
+         </iconset>
         </property>
         <property name="default">
          <bool>true</bool>

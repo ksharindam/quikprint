@@ -1,16 +1,16 @@
-# Quik Print
-Simple Qt frontend of lp command for using with HP Deskjet 2130 series
+# QuikPrint
+Simple Qt frontend of lp command for using with HP Deskjet and Brother inkjet printers  
 
 ### Dependencies
-* python-qt4  
+* python3-pyqt4  
 * cups  
 
 ### Install
 Open terminal and change directory to quikprint-master. Then run...  
-`pip install --user .`  
+`pip3 install --user .`  
 
 ### Uninstall
-`pip uninstall quikprint`  
+`pip3 uninstall quikprint`  
 
 ### Print a File
 To print a file right click the file in file manager and select _Open With..._ Quik Print  
