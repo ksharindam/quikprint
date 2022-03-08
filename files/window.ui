@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>516</height>
+    <height>505</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,14 +50,14 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>Page Set :</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="4" column="0">
        <widget class="QRadioButton" name="pageSetAll">
         <property name="text">
          <string>All</string>
@@ -67,7 +67,7 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1">
+      <item row="4" column="1">
        <widget class="QRadioButton" name="pageSetOdd">
         <property name="text">
          <string>Odd</string>
@@ -78,7 +78,7 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="2">
+      <item row="4" column="2">
        <widget class="QRadioButton" name="pageSetEven">
         <property name="text">
          <string>Even</string>
@@ -89,33 +89,30 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1" colspan="2">
+      <item row="2" column="1" colspan="2">
        <widget class="QLineEdit" name="pagerangeEdit">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="placeholderText">
          <string>e.g. = 1,2,5-9,14</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QRadioButton" name="allPagesBtn">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Page Ranges :</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="reverseBtn">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>All Pages</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QRadioButton" name="rangeBtn">
-        <property name="text">
-         <string>Range</string>
+         <string>Reverse</string>
         </property>
        </widget>
       </item>

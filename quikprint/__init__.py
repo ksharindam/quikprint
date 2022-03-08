@@ -6,6 +6,7 @@ Python Module Name = quikprint
 Debian Dependency = python3-pyqt4, cups
 Description = Simple Qt frontend of Printing command lp
 Changes :
+v2.10   added : reverse page order button, removed all pages button
 v2.9    added : brother inkjet printers support
 v2.8    first page will be on top if all pages are printed
 v2.7    collates copies if multiple copies are printed
@@ -20,7 +21,7 @@ v1.3    fixed : crash at startup if no printer added
 v1.2    Selects filenames when not provided via cmdline args
         Even and odd pages icons added
 ...........................................................................
-|   Copyright (C) 2019-2021 Arindam Chaudhuri <ksharindam@gmail.com>       |
+|   Copyright (C) 2019-2022 Arindam Chaudhuri <ksharindam@gmail.com>       |
 |                                                                          |
 |   This program is free software: you can redistribute it and/or modify   |
 |   it under the terms of the GNU General Public License as published by   |
@@ -39,5 +40,5 @@ v1.2    Selects filenames when not provided via cmdline args
 #TODO :
 #      validate page range
 
-__version__ = '2.9'
+__version__ = '2.10'
 

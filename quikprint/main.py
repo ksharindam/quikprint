@@ -39,6 +39,7 @@ class Window(QDialog, Ui_Dialog):
     def __init__(self):
         QDialog.__init__(self)
         QIcon.setThemeName("Adwaita")
+        self.setWindowIcon(QIcon.fromTheme("document-print"))
         self.setupUi(self)
         self.resize(640, 480)
         self.setWindowTitle("QuikPrint  " + __version__)
@@ -46,10 +47,6 @@ class Window(QDialog, Ui_Dialog):
         # Create and setup widgets
         self.widthSpin.setHidden(True)
         self.heightSpin.setHidden(True)
-        self.pageSetGroup = QButtonGroup(self)
-        self.pageSetGroup.addButton(self.allPagesBtn)
-        self.pageSetGroup.addButton(self.rangeBtn)
-        self.allPagesBtn.setChecked(True)
         rangeValidator = QRegExpValidator(self.pagerangeEdit)
         rangeValidator.setRegExp(QRegExp('([0-9,-])*')) # TODO : check validity of whole string
         self.pagerangeEdit.setValidator(rangeValidator)
@@ -87,7 +84,6 @@ class Window(QDialog, Ui_Dialog):
         self.heightSpin.setValue(paper_h)
         # Connect Signals
         self.printersCombo.currentIndexChanged.connect(self.selectPrinter)
-        self.pageSetGroup.buttonClicked.connect(self.onPageRangeChange)
         self.paperSizeCombo.currentIndexChanged.connect(self.onPaperSizeChange)
         self.pixelDensityBtn.clicked.connect(self.onDensityBtnClick)
         self.printBtn.clicked.connect(self.accept)
@@ -119,10 +115,6 @@ class Window(QDialog, Ui_Dialog):
         self.widthSpin.setHidden(hide_custom)
         self.heightSpin.setHidden(hide_custom)
 
-    def onPageRangeChange(self, btn):
-        self.pagerangeEdit.setEnabled(btn is self.rangeBtn)
-        self.pagerangeEdit.setFocus()
-
     def onDensityBtnClick(self, checked):
         self.ppiSpin.setEnabled(checked)
         self.naturalScalingSpin.setEnabled(checked)
@@ -145,7 +137,6 @@ class Window(QDialog, Ui_Dialog):
         ext = os.path.splitext(filenames[0])[1].lower()
         image_printing = ext==".jpg" or ext==".jpeg"
 
-        if self.rangeBtn.isChecked() and self.pagerangeEdit.text() == '' : return
         # set printer specific options
         printer_name = self.printersCombo.currentText()
         run_command("lpoptions", ["-d", printer_name])
@@ -181,10 +172,10 @@ class Window(QDialog, Ui_Dialog):
             if not self.pageSetAll.isChecked():
                 page_set = 'odd' if self.pageSetOdd.isChecked() else 'even'
                 lp_args += ['-o', 'page-set='+page_set]
-            if not self.allPagesBtn.isChecked():
+            if self.pagerangeEdit.text()!="":
                 lp_args += ['-o', 'page-ranges='+self.pagerangeEdit.text()]
             # reverse pages so that first page will be on top
-            if self.allPagesBtn.isChecked() and self.pageSetAll.isChecked():
+            if self.reverseBtn.isChecked() or self.pageSetAll.isChecked() and self.pagerangeEdit.text()=="":
                 lp_args += ["-o", "outputorder=reverse"]
             # scale page to fit inside print margin
             if self.fitToPageBtn.isChecked():
