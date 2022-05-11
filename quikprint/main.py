@@ -277,11 +277,11 @@ class HP_DeskJet:
         self.color_modes = ['KGray', 'RGB']  # ColorModel
         self.quality_modes = ['FastDraft', 'Normal', 'Best', 'Photo'] # OutputMode
         self.paper_types = ['Plain', 'Glossy'] # MediaType
-        self.paper_sizes = ['A4', 'A5', 'Letter', 'Legal', 'Custom.WIDTHxHEIGHT'] # PageSize
+        self.paper_sizes = ['A4', 'A5', 'A6', 'Letter', 'Legal', 'Custom.WIDTHxHEIGHT'] # PageSize
         # following values are used by the main dialog
         self.quality_names = ['Eco', 'Normal', 'Fine', 'Photo']
         self.papertype_names = ["Plain", "Photo"]
-        self.papersize_names = ['A4', 'A5', 'Letter', 'Legal', 'Custom']
+        self.papersize_names = ['A4', 'A5', 'A6', 'Letter', 'Legal', 'Custom']
         self.colormode_index = 0
         self.quality_index = 0
         self.papertype_index = 0

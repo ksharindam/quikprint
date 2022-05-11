@@ -6,6 +6,7 @@ Python Module Name = quikprint
 Debian Dependency = python3-pyqt4, cups
 Description = Simple Qt frontend of Printing command lp
 Changes :
+v2.11   added : A6 paper size for HP Deskjet
 v2.10   added : reverse page order button, removed all pages button
 v2.9    added : brother inkjet printers support
 v2.8    first page will be on top if all pages are printed
@@ -40,5 +41,5 @@ v1.2    Selects filenames when not provided via cmdline args
 #TODO :
 #      validate page range
 
-__version__ = '2.10'
+__version__ = '2.11'
 
