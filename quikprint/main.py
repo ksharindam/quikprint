@@ -330,7 +330,7 @@ class Brother_Inkjet:
         self.printer = printer_device
         self.color_modes = ['Mono', 'FullColor'] # BRMonoColor
         self.quality_modes = ['Draft', 'Normal', 'Fine'] # BRResolution
-        self.paper_types = ['Plain', 'Glossy'] # MediaType
+        self.paper_types = ['Plain', 'Glossy'] # BRMediaType
         self.paper_sizes = ['BrA4_B', 'A4', 'A5', 'Letter', 'Legal', 'BrPostC4x6_B'] # # PageSize
         # following values are used by dialog
         self.quality_names = ['Eco', 'Normal', 'Fine']
@@ -350,7 +350,7 @@ class Brother_Inkjet:
             options = parseOptions(output)
             self.colormode_index = getValueIndex(options, self.color_modes, "BRMonoColor")
             self.quality_index = getValueIndex(options, self.quality_modes, 'BRResolution')
-            self.papertype_index = getValueIndex(options, self.paper_sizes, 'MediaType')
+            self.papertype_index = getValueIndex(options, self.paper_sizes, 'BRMediaType')
             self.papersize_index = getValueIndex(options, self.paper_sizes, 'PageSize')
         except:
             return False
@@ -364,7 +364,7 @@ class Brother_Inkjet:
 
         lpoptions_args = ['-p', self.printer,
                         '-o', 'BRMonoColor='+color_mode, '-o', 'BRResolution='+quality,
-                        '-o', "MediaType="+paper_type, '-o', 'PageSize='+paper_size]
+                        '-o', "BRMediaType="+paper_type, '-o', 'PageSize='+paper_size]
 
         print('lpoptions', ' '.join(lpoptions_args))
         process = QProcess()
