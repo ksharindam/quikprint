@@ -2,7 +2,7 @@
 Simple Qt frontend of lp command for using with HP Deskjet and Brother inkjet printers  
 
 ### Dependencies
-* python3-pyqt4  
+* python3-pyqt5  
 * cups  
 
 ### Install

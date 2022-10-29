@@ -3,9 +3,11 @@ Name = quikprint
 Executable Command = quikprint
 Package Name = quikprint
 Python Module Name = quikprint
-Debian Dependency = python3-pyqt4, cups
+Debian Dependency = python3-pyqt5, cups
 Description = Simple Qt frontend of Printing command lp
 Changes :
+v3.0    migrated from PyQt4 to PyQt5
+v2.13   added : 4R (bordered) papersize to Brother_Inkjet
 v2.12   fixed : Photo paper could not be set on Brother_Inkjet (USB)
 v2.11   added : A6 paper size for HP Deskjet
 v2.10   added : reverse page order button, removed all pages button
@@ -41,6 +43,7 @@ v1.2    Selects filenames when not provided via cmdline args
 """
 #TODO :
 #      validate page range
+#      reverse button should become unchecked when page set or range is changed
 
-__version__ = '2.12'
+__version__ = '3.0'
 

@@ -2,9 +2,10 @@
 # -- coding: utf-8 --
 
 import sys, os, subprocess
-from PyQt4.QtGui import (QApplication, QDialog, QButtonGroup, QRegExpValidator,
-    QMessageBox, QFileDialog, QIcon)
-from PyQt4.QtCore import QProcess, QRegExp, QSettings
+from PyQt5.QtGui import QIcon, QRegExpValidator
+from PyQt5.QtWidgets import (QApplication, QDialog, QButtonGroup,
+    QMessageBox, QFileDialog)
+from PyQt5.QtCore import QProcess, QRegExp, QSettings
 
 sys.path.append(os.path.dirname(__file__))
 from ui_window import Ui_Dialog
@@ -53,7 +54,7 @@ class Window(QDialog, Ui_Dialog):
         # Set values
         printers = self.getPrinters()
         if printers == []:
-            QMessageBox.critical(self, 'Error !', 'No Printers added', 'Close')
+            QMessageBox.critical(self, 'Error !', 'No Printers added', QMessageBox.Close)
             return QDialog.accept(self)
         self.printersCombo.addItems(printers)
         # select default printer options
@@ -66,7 +67,7 @@ class Window(QDialog, Ui_Dialog):
         self.printersCombo.setCurrentIndex(selected_index)
         self.selectPrinter(selected_index)
         # get printer independent options
-        fit_to_page = True if self.settings.value("FitToPage", "false")=='true' else False
+        fit_to_page = self.settings.value("FitToPage", "false")=='true'
         self.fitToPageBtn.setChecked(fit_to_page)
         brightness = int(self.settings.value("Brightness", 100))
         gamma = int(self.settings.value("Gamma", 1000))
@@ -94,7 +95,7 @@ class Window(QDialog, Ui_Dialog):
         printer_name = self.printersCombo.itemText(index)
         printer = printer_from_name(printer_name)
         if not printer.getOptions():
-            QMessageBox.critical(self, 'Error !', 'Could not get Printer options', 'Close')
+            QMessageBox.critical(self, 'Error !', 'Could not get Printer options', QMessageBox.Close)
             return QDialog.accept(self)
 
         self.qualityCombo.clear()
@@ -129,7 +130,7 @@ class Window(QDialog, Ui_Dialog):
                 if os.path.exists(each):
                     filenames.append(os.path.abspath(each))
         if filenames == []:
-            files = QFileDialog.getOpenFileNames(self, 'Select Files to Print')
+            files, _filter = QFileDialog.getOpenFileNames(self, 'Select Files to Print')
             if list(files) == [] : return
             for each in files:
                 filenames.append(each)
@@ -147,7 +148,7 @@ class Window(QDialog, Ui_Dialog):
         papersize_index = self.paperSizeCombo.currentIndex()
         custom_size = [self.widthSpin.value(), self.heightSpin.value()]# in millimeter
         if not printer.setOptions(colormode_index, quality_index, papertype_index, papersize_index, custom_size):
-            QMessageBox.critical(self, 'Error !', 'Could not set printer options', 'Close')
+            QMessageBox.critical(self, 'Error !', 'Could not set printer options', QMessageBox.Close)
             return QDialog.accept(self)
         # get printing options
         lp_args = ['-d', printer_name]
@@ -184,7 +185,7 @@ class Window(QDialog, Ui_Dialog):
         print('lp', ' '.join(lp_args))
         ret = QProcess.execute('lp', lp_args + ['--'] + filenames)
         if ret<0:
-            QMessageBox.critical(self, 'Error !', 'Error : Could not execute lp', 'Close')
+            QMessageBox.critical(self, 'Error !', 'Error : Could not execute lp', QMessageBox.Close)
         self.saveSettings()
         QDialog.accept(self)
 
@@ -210,7 +211,7 @@ class Window(QDialog, Ui_Dialog):
             subprocess.Popen(['cancel', job_id])
 
     def saveSettings(self):
-        self.settings.setValue("FItToPage", self.fitToPageBtn.isChecked())
+        self.settings.setValue("FitToPage", self.fitToPageBtn.isChecked())
         self.settings.setValue("Brightness", self.brightnessSpin.value())
         self.settings.setValue("Gamma", self.gammaSpin.value())
         self.settings.setValue("PPI", self.ppiSpin.value())
@@ -331,11 +332,11 @@ class Brother_Inkjet:
         self.color_modes = ['Mono', 'FullColor'] # BRMonoColor
         self.quality_modes = ['Draft', 'Normal', 'Fine'] # BRResolution
         self.paper_types = ['Plain', 'Glossy'] # BRMediaType
-        self.paper_sizes = ['BrA4_B', 'A4', 'A5', 'Letter', 'Legal', 'BrPostC4x6_B'] # # PageSize
-        # following values are used by dialog
+        self.paper_sizes = ['A4', 'A5', 'Letter', 'Legal', 'BrPostC4x6_S', 'BrPostC4x6_B', 'BrA4_B'] # # PageSize
+        # following values are displayed by dialog
         self.quality_names = ['Eco', 'Normal', 'Fine']
         self.papertype_names = ["Plain", "Photo"]
-        self.papersize_names = ['A4 (Borderless)', 'A4', 'A5', 'Letter', 'Legal', '4R (Borderless)']
+        self.papersize_names = ['A4', 'A5', 'Letter', 'Legal', '4R', '4R (Borderless)', 'A4 (Borderless)']
         self.colormode_index = 0
         self.quality_index = 0
         self.papertype_index = 0
