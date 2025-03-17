@@ -1,5 +1,5 @@
 # QuikPrint
-Simple Qt frontend of lp command for using with HP Deskjet and Brother inkjet printers  
+Simple Qt frontend of lp command for using with Epson Ecotank, HP Deskjet and Brother inkjet printers  
 
 ### Dependencies
 * python3-pyqt5  
@@ -19,4 +19,4 @@ Or in a terminal type...
 `quikprint file.pdf`  
 
 ### Screenshot
-![Screenshot](files/Screenshot.png)
+![Screenshot](data/screenshots/Screenshot.png)

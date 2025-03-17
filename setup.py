@@ -8,7 +8,7 @@ setup(
       version=__version__,
       description='Simple Qt frontend of Printing command lp',
       long_description='Simple Qt frontend of Printing command lp',
-      keywords='printing pyqt pyqt4 qt4',
+      keywords='printing pyqt pyqt5 qt5',
       url='http://github.com/ksharindam/quikprint',
       author='Arindam Chaudhuri',
       author_email='ksharindam@gmail.com',
@@ -19,13 +19,13 @@ setup(
       'Environment :: X11 Applications :: Qt',
       'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
       'Operating System :: POSIX :: Linux',
-      'Programming Language :: Python :: 2',
+      'Programming Language :: Python :: 3',
       ],
       entry_points={
-          'console_scripts': ['quikprint=quikprint.main:main'],
+          'gui_scripts': ['quikprint=quikprint.main:main'],
       },
       data_files=[
-                 ('share/applications', ['files/quikprint.desktop']),
+                 ('share/applications', ['data/quikprint.desktop']),
       ],
       include_package_data=True,
       zip_safe=False)

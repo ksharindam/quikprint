@@ -22,15 +22,16 @@ fromByteArray = lambda bA : bytes(bA).decode("utf-8")
 # lpstat -a -> show printer names and accepting status. Output -
 # DeskJet_2130 accepting requests since Wed 22 Sep 2021 01:14:01 PM IST
 
-# View printer specific options by
-# lpoptions -p Printer_Name -l
-
 # set default printer
 # lpoptions -d Printer_Name
 
 # view default printer
 # lpstat -d
 # system default destination: DeskJet_2130
+
+# View printer specific options by
+# lpoptions -p Printer_Name -l
+
 
 # view all lp command options online
 # https://opensource.apple.com/source/cups/cups-30/doc/sum.shtml
@@ -42,7 +43,7 @@ class Window(QDialog, Ui_Dialog):
         QIcon.setThemeName("Adwaita")
         self.setWindowIcon(QIcon.fromTheme("document-print"))
         self.setupUi(self)
-        self.resize(640, 480)
+        self.resize(640, 460)
         self.setWindowTitle("QuikPrint  " + __version__)
         self.settings = QSettings(self)
         # Create and setup widgets
@@ -69,14 +70,12 @@ class Window(QDialog, Ui_Dialog):
         # get printer independent options
         fit_to_page = self.settings.value("FitToPage", "false")=='true'
         self.fitToPageBtn.setChecked(fit_to_page)
-        brightness = int(self.settings.value("Brightness", 100))
         gamma = int(self.settings.value("Gamma", 1000))
         ppi = int(self.settings.value("PPI", 300))
         natural_scaling = int(self.settings.value("NaturalScaling", 100))
         scaling = int(self.settings.value("Scaling", 100))
         paper_w = int(self.settings.value("PaperW", 100))
         paper_h = int(self.settings.value("PaperH", 100))
-        self.brightnessSpin.setValue(brightness)
         self.gammaSpin.setValue(gamma)
         self.ppiSpin.setValue(ppi)
         self.naturalScalingSpin.setValue(natural_scaling)
@@ -157,7 +156,7 @@ class Window(QDialog, Ui_Dialog):
         copies = self.copiesSpin.value()
         if copies>1 :
             lp_args += ['-n', str(copies), '-o', 'collate=true']
-        lp_args += ['-o', 'brightness=%i'%self.brightnessSpin.value()]
+        # removed -o brightness=100 option, as epson printers do not support
         lp_args += ['-o', 'gamma=%i'%self.gammaSpin.value()]
         # Image printing options
         if image_printing:
@@ -212,7 +211,6 @@ class Window(QDialog, Ui_Dialog):
 
     def saveSettings(self):
         self.settings.setValue("FitToPage", self.fitToPageBtn.isChecked())
-        self.settings.setValue("Brightness", self.brightnessSpin.value())
         self.settings.setValue("Gamma", self.gammaSpin.value())
         self.settings.setValue("PPI", self.ppiSpin.value())
         self.settings.setValue("NaturalScaling", self.naturalScalingSpin.value())
@@ -263,6 +261,11 @@ class DummyPrinter:
         self.quality_index = 0
         self.papertype_index = 0
         self.papersize_index = 0
+        print("using dummy printer")
+
+    @staticmethod
+    def supportsDevice(device_name, uri):
+        return True
 
     def getOptions(self):
         return True
@@ -288,6 +291,12 @@ class HP_DeskJet:
         self.papertype_index = 0
         self.papersize_index = 0
 
+    @staticmethod
+    def supportsDevice(device_name, uri):
+        # in debian 10, hp:/usb/DeskJet_2130_series?serial=CN8BK484PD065Z
+        # in debian 12, usb://HP/DeskJet%202130%20series?serial=CN8BK484PD065Z&interface=1
+        return "DeskJet" in uri
+
     def getOptions(self):
         #print('lpoptions -p %s -l'%self.printer)
         output = run_command('lpoptions', ['-p', self.printer, '-l'])
@@ -297,7 +306,8 @@ class HP_DeskJet:
             options = parseOptions(output)
             self.colormode_index = getValueIndex(options, self.color_modes, "ColorModel")
             self.quality_index = getValueIndex(options, self.quality_modes, 'OutputMode')
-            self.papertype_index = getValueIndex(options, self.paper_sizes, 'MediaType')
+            # commented out, to always use plain paper when startup
+            # self.papertype_index = getValueIndex(options, self.paper_types, 'MediaType')
             self.papersize_index = getValueIndex(options, self.paper_sizes, 'PageSize')
         except:
             return False
@@ -325,22 +335,31 @@ class HP_DeskJet:
         return True
 
 
-class Brother_Inkjet:
+class Brother_Inktank:
     ''' Handles printer specific options '''
     def __init__(self, printer_device):
         self.printer = printer_device
         self.color_modes = ['Mono', 'FullColor'] # BRMonoColor
         self.quality_modes = ['Draft', 'Normal', 'Fine'] # BRResolution
-        self.paper_types = ['Plain', 'Glossy'] # BRMediaType
+        self.paper_types = ['Plain', 'Glossy', 'Inkjet'] # BRMediaType
         self.paper_sizes = ['A4', 'A5', 'Letter', 'Legal', 'BrPostC4x6_S', 'BrPostC4x6_B', 'BrA4_B'] # # PageSize
         # following values are displayed by dialog
         self.quality_names = ['Eco', 'Normal', 'Fine']
-        self.papertype_names = ["Plain", "Photo"]
+        self.papertype_names = ["Plain", "Photo", "Inkjet"]
         self.papersize_names = ['A4', 'A5', 'Letter', 'Legal', '4R', '4R (Borderless)', 'A4 (Borderless)']
         self.colormode_index = 0
         self.quality_index = 0
         self.papertype_index = 0
         self.papersize_index = 0
+
+    @staticmethod
+    def supportsDevice(device_name, uri):
+        # usb://Brother/DCP-T420W?serial=E80718H1H136313
+        # ipp://BrotherT420W.local:631/ipp/print (except IPP Everywhere driver)
+        if "://Brother" in uri:
+            return True
+        return False
+
 
     def getOptions(self):
         #print('lpoptions -p %s -l'%self.printer)
@@ -351,7 +370,8 @@ class Brother_Inkjet:
             options = parseOptions(output)
             self.colormode_index = getValueIndex(options, self.color_modes, "BRMonoColor")
             self.quality_index = getValueIndex(options, self.quality_modes, 'BRResolution')
-            self.papertype_index = getValueIndex(options, self.paper_sizes, 'BRMediaType')
+            # commented out, to always use plain paper when startup
+            #self.papertype_index = getValueIndex(options, self.paper_types, 'BRMediaType')
             self.papersize_index = getValueIndex(options, self.paper_sizes, 'PageSize')
         except:
             return False
@@ -376,23 +396,32 @@ class Brother_Inkjet:
         return True
 
 
-class Brother_Wifi:
+
+class Canon_Inktank:
     ''' Handles printer specific options '''
     def __init__(self, printer_device):
         self.printer = printer_device
-        self.color_modes = ['Gray', 'RGB'] # ColorModel
-        self.quality_modes = ['3', '4', '5'] # cupsPrintQuality
-        self.paper_types = ['Stationery', 'PhotographicGlossy'] # MediaType
-        self.paper_sizes = ['A4.Borderless', 'A4', 'A5', 'Letter', 'Legal',
-                            '4x6.Borderless', 'Custom.WIDTHxHEIGHT'] # PageSize
-        # following values are used by dialog
-        self.quality_names = ['Eco', 'Normal', 'Fine']
-        self.papertype_names = ["Plain", "Photo"]
-        self.papersize_names = ['A4 (Borderless)', 'A4', 'A5', 'Letter', 'Legal', '4R (Borderless)', 'Custom']
+        self.color_modes = ['True', 'False'] # CNGrayscale
+        self.quality_modes = ['Normal']
+        self.paper_types = ['plain', 'photopaper', 'matte'] # MediaType
+        self.paper_sizes = ['A4', 'A5', 'Letter', 'legal', '4x6', '4x6.bl', 'A4.bl'] # # PageSize
+        # following values are displayed by dialog
+        self.quality_names = ['Normal']
+        self.papertype_names = ["Plain", "Photo Paper", "Matte"]
+        self.papersize_names = ['A4', 'A5', 'Letter', 'Legal', '4R', '4R (Borderless)', 'A4 (Borderless)']
         self.colormode_index = 0
         self.quality_index = 0
         self.papertype_index = 0
         self.papersize_index = 0
+
+    @staticmethod
+    def supportsDevice(device_name, uri):
+        # usb://Canon/G3010%20series?serial=221C89&interface=1
+        # ipps://Canon%20G3010%20series._ipps._tcp.local/
+        if "://Canon" in uri:
+            return True
+        return False
+
 
     def getOptions(self):
         #print('lpoptions -p %s -l'%self.printer)
@@ -401,9 +430,10 @@ class Brother_Wifi:
             return False
         try:
             options = parseOptions(output)
-            self.colormode_index = getValueIndex(options, self.color_modes, "ColorModel")
-            self.quality_index = getValueIndex(options, self.quality_modes, 'cupsPrintQuality')
-            self.papertype_index = getValueIndex(options, self.paper_sizes, 'MediaType')
+            self.colormode_index = getValueIndex(options, self.color_modes, "CNGrayscale")
+            #self.quality_index = 0
+            # commented out, to always use plain paper when startup
+            #self.papertype_index = getValueIndex(options, self.paper_types, 'MediaType')
             self.papersize_index = getValueIndex(options, self.paper_sizes, 'PageSize')
         except:
             return False
@@ -411,15 +441,12 @@ class Brother_Wifi:
 
     def setOptions(self, colormode_index, quality_index, papertype_index, papersize_index, custom_size=[]):
         color_mode = self.color_modes[colormode_index]
-        quality = self.quality_modes[quality_index]
+        #quality = self.quality_modes[quality_index]
         paper_type = self.paper_types[papertype_index]
         paper_size = self.paper_sizes[papersize_index]
 
-        if paper_size == 'Custom.WIDTHxHEIGHT':
-            paper_size = 'Custom.%ix%imm'%(custom_size[0], custom_size[1])
-
         lpoptions_args = ['-p', self.printer,
-                        '-o', 'ColorModel='+color_mode, '-o', 'cupsPrintQuality='+quality,
+                        '-o', 'CNGrayscale='+color_mode,
                         '-o', "MediaType="+paper_type, '-o', 'PageSize='+paper_size]
 
         print('lpoptions', ' '.join(lpoptions_args))
@@ -431,20 +458,86 @@ class Brother_Wifi:
         return True
 
 
+
+
+class Epson_Ecotank:
+    ''' Handles printer specific options (Handles both USB and WiFi)'''
+    def __init__(self, printer_device):
+        self.printer = printer_device
+        self.color_modes = ['MONO', 'COLOR'] # Ink
+        self.media_types = ['PLAIN_HIGH', 'PLAIN_NORMAL', # Plain Paper
+                            'SFINE_HIGH', 'SFINE_NORMAL', # Epson Photo Quality Ink Jet
+                            'PMMATT_HIGH', 'PMMATT_NORMAL', # Epson Matte
+                            'PLATINA_HIGH', 'PLATINA_NORMAL', # Epson Ultra Glossy
+                            'PMPHOTO_HIGH', 'PMPHOTO_NORMAL', # Epson Premium Glossy
+                            'PSGLOS_HIGH', 'PSGLOS_NORMAL', # Epson Premium Semigloss
+                            'LCPP_HIGH', 'LCPP_NORMAL', # Photo Paper Glossy
+                            'ENV_HIGH', 'ENV_NORMAL', # Envelop
+        ]
+        self.paper_sizes = ['A4', 'A5', 'A6', 'Letter', 'Legal', '4X6FULL', 'T4X6FULL'] # PageSize
+        # following values are used by dialog
+        self.quality_names = ['High', 'Normal']
+        self.papertype_names = ["Plain", "InkJet", "Matte", "Ultra Glossy",
+                                "Premium Glossy", "Premium Semigloss", "Photo", "Envelop"]
+        self.papersize_names = ['A4', 'A5', 'A6', 'Letter', 'Legal', '4R', '4R (Borderless)']
+        self.colormode_index = 0
+        self.quality_index = 0
+        self.papertype_index = 0
+        self.papersize_index = 0
+
+    @staticmethod
+    def supportsDevice(device_name, uri):
+        return "://EPSON" in uri
+
+
+    def getOptions(self):
+        #print('lpoptions -p %s -l'%self.printer)
+        output = run_command('lpoptions', ['-p', self.printer, '-l'])
+        if output == "" :
+            return False
+        try:
+            options = parseOptions(output)
+            self.colormode_index = getValueIndex(options, self.color_modes, "Ink")
+            mediatype_index = getValueIndex(options, self.media_types, 'MediaType')
+            self.quality_index = mediatype_index%2
+            # commented out, to always use plain paper when startup
+            #self.papertype_index = mediatype_index//2
+            self.papersize_index = getValueIndex(options, self.paper_sizes, 'PageSize')
+        except:
+            return False
+        return True
+
+    def setOptions(self, colormode_index, quality_index, papertype_index, papersize_index, custom_size=[]):
+        color_mode = self.color_modes[colormode_index]
+        media_type = self.media_types[papertype_index*2 + quality_index]
+        paper_size = self.paper_sizes[papersize_index]
+
+        lpoptions_args = ['-p', self.printer,
+                        '-o', 'Ink='+color_mode,
+                        '-o', "MediaType="+media_type, '-o', 'PageSize='+paper_size]
+
+        print('lpoptions', ' '.join(lpoptions_args))
+        process = QProcess()
+        process.start('lpoptions', lpoptions_args)
+        if not process.waitForFinished():
+            print("Error : Could not execute lpoptions")
+            return False
+        return True
+
+
+
 def printer_from_name(name):
     # output is like -
-    # device for DeskJet_2130: hp:/usb/DeskJet_2130_series?serial=CN8BK484PD065Z
+    # "device for DeskJet_2130: hp:/usb/DeskJet_2130_series?serial=CN8BK484PD065Z"
     output = run_command('lpstat', ['-v', name])
     if output == "" :
         return DummyPrinter(name)
     uri = output.split()[-1]
-    if uri.startswith("usb://Brother/"):
-        return Brother_Inkjet(name)
-    elif uri.startswith("ipp://BR"):
-        return Brother_Wifi(name)
-    elif "DeskJet" in uri:
-        return HP_DeskJet(name)
+    for printer_class in (HP_DeskJet, Brother_Inktank, Epson_Ecotank, Canon_Inktank):
+        if printer_class.supportsDevice(name, uri):
+            return printer_class(name)
     return DummyPrinter(name)
+
 
 def run_command(cmd, args):
     process = QProcess()
